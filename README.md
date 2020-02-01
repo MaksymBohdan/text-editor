@@ -4,6 +4,8 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 ## Initial setup
 Run `npm install` in order to setup application
 
+dd
+
 ## Development server
 Run `npm start` for a dev server.
 
