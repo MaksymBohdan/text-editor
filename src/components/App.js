@@ -7,7 +7,7 @@ import getMockText from '../services/text.service';
 class App extends Component {
   state = {
     text: [],
-    selectedId: null
+    selectedWord: {}
   };
 
   componentDidMount() {
@@ -19,9 +19,9 @@ class App extends Component {
       .then(data => {
         const text = data.split(' ').map((word, idx) => ({
           content: word,
-          bold: true,
-          italic: true,
-          underline: true,
+          bold: false,
+          italic: false,
+          underline: false,
           id: idx
         }));
 
@@ -30,26 +30,30 @@ class App extends Component {
       .catch(err => console.error(err));
   };
 
-  getSelectedWord = e => this.setState({ selectedId: e.target.dataset.id });
+  getSelectedWord = e => {
+    const { text } = this.state;
+    const selectedWord = text[e.target.dataset.id];
+
+    this.setState({ selectedWord });
+  };
 
   changeStyle = e => {
-    const { selectedId, text } = this.state;
-    if (!selectedId) return;
+    const { selectedWord, text } = this.state;
+    if (Object.keys(selectedWord).length <= 0) return;
 
     const styleChanges = e.currentTarget.dataset.name;
-    const wordToChange = text[selectedId];
     const changedWord = {
-      ...wordToChange,
-      [styleChanges]: !wordToChange[styleChanges]
+      ...selectedWord,
+      [styleChanges]: !selectedWord[styleChanges]
     };
     const textToUpdate = [...text];
-    textToUpdate.splice(selectedId, 1, changedWord);
+    textToUpdate.splice(selectedWord.id, 1, changedWord);
 
-    this.setState({ text: textToUpdate });
+    this.setState({ text: textToUpdate, selectedWord: changedWord });
   };
 
   render() {
-    const { text } = this.state;
+    const { text, selectedWord } = this.state;
 
     return (
       <div className="App">
@@ -57,7 +61,10 @@ class App extends Component {
           <span>Simple Text Editor</span>
         </header>
         <main>
-          <ControlPanel changeStyle={this.changeStyle} />
+          <ControlPanel
+            changeStyle={this.changeStyle}
+            selectedWord={selectedWord}
+          />
           <FileZone
             textToDisplay={text}
             getSelectedWord={this.getSelectedWord}
