@@ -17,10 +17,11 @@ class App extends Component {
   getText = () => {
     getMockText()
       .then(data => {
-        const text = data.split('').map((word, idx) => ({
+        const text = data.split(' ').map((word, idx) => ({
           content: word,
-          bold: false,
+          bold: true,
           italic: true,
+          underline: true,
           id: idx
         }));
 
@@ -29,12 +30,22 @@ class App extends Component {
       .catch(err => console.error(err));
   };
 
-  getSelectedWord = e => {
-    // const selectedWord = window.getSelection().toString();
-    const selectedWord = e.target.dataset.id;
+  getSelectedWord = e => this.setState({ selectedId: e.target.dataset.id });
 
-    console.log(selectedWord);
-    this.setState({ selectedWord: selectedWord !== '' && selectedWord });
+  changeStyle = e => {
+    const { selectedId, text } = this.state;
+    if (!selectedId) return;
+
+    const styleChanges = e.currentTarget.dataset.name;
+    const wordToChange = text[selectedId];
+    const changedWord = {
+      ...wordToChange,
+      [styleChanges]: !wordToChange[styleChanges]
+    };
+    const textToUpdate = [...text];
+    textToUpdate.splice(selectedId, 1, changedWord);
+
+    this.setState({ text: textToUpdate });
   };
 
   render() {
@@ -46,7 +57,7 @@ class App extends Component {
           <span>Simple Text Editor</span>
         </header>
         <main>
-          <ControlPanel />
+          <ControlPanel changeStyle={this.changeStyle} />
           <FileZone
             textToDisplay={text}
             getSelectedWord={this.getSelectedWord}
