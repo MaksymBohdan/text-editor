@@ -6,7 +6,8 @@ import getMockText from '../services/text.service';
 
 class App extends Component {
   state = {
-    text: ''
+    text: [],
+    selectedId: null
   };
 
   componentDidMount() {
@@ -15,8 +16,25 @@ class App extends Component {
 
   getText = () => {
     getMockText()
-      .then(text => this.setState({ text }))
+      .then(data => {
+        const text = data.split('').map((word, idx) => ({
+          content: word,
+          bold: false,
+          italic: true,
+          id: idx
+        }));
+
+        this.setState({ text });
+      })
       .catch(err => console.error(err));
+  };
+
+  getSelectedWord = e => {
+    // const selectedWord = window.getSelection().toString();
+    const selectedWord = e.target.dataset.id;
+
+    console.log(selectedWord);
+    this.setState({ selectedWord: selectedWord !== '' && selectedWord });
   };
 
   render() {
@@ -29,7 +47,10 @@ class App extends Component {
         </header>
         <main>
           <ControlPanel />
-          <FileZone textToDisplay={text} />
+          <FileZone
+            textToDisplay={text}
+            getSelectedWord={this.getSelectedWord}
+          />
         </main>
       </div>
     );
