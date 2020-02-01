@@ -1,13 +1,16 @@
 import React, { Component } from 'react';
-import './App.css';
 import ControlPanel from './control-panel/ControlPanel';
-import FileZone from './file-zone/FileZone';
+import FileZone from './FileZone/FileZone';
+import SunonimusZone from './SynonimusCmp/SynonimusCmp';
 import getMockText from '../services/text.service';
+import getSimilarWords from '../services/synonimusService';
+import { AppContainer, Header, Main } from './styles';
 
 class App extends Component {
   state = {
     text: [],
-    selectedWord: {}
+    selectedWord: {},
+    synonimus: []
   };
 
   componentDidMount() {
@@ -38,7 +41,7 @@ class App extends Component {
   };
 
   changeStyle = e => {
-    const { selectedWord, text } = this.state;
+    const { selectedWord } = this.state;
     if (Object.keys(selectedWord).length <= 0) return;
 
     const styleChanges = e.currentTarget.dataset.name;
@@ -46,31 +49,64 @@ class App extends Component {
       ...selectedWord,
       [styleChanges]: !selectedWord[styleChanges]
     };
-    const textToUpdate = [...text];
-    textToUpdate.splice(selectedWord.id, 1, changedWord);
 
-    this.setState({ text: textToUpdate, selectedWord: changedWord });
+    this.updateAppropriateWord(selectedWord, changedWord);
+  };
+
+  handleWordReplace = e => {
+    const { selectedWord } = this.state;
+    if (Object.keys(selectedWord).length <= 0) return;
+
+    const wordToUpdate = {
+      ...selectedWord,
+      content: e.currentTarget.dataset.name
+    };
+
+    this.updateAppropriateWord(selectedWord, wordToUpdate);
+  };
+
+  updateAppropriateWord = (currentWord, newWord) => {
+    const { text } = this.state;
+    const textToUpdate = [...text];
+
+    textToUpdate.splice(currentWord.id, 1, newWord);
+
+    this.setState({ text: textToUpdate, selectedWord: newWord });
+  };
+
+  getWords = () => {
+    const {
+      selectedWord: { content }
+    } = this.state;
+    if (!content) return;
+
+    getSimilarWords(content)
+      .then(synonimus => this.setState({ synonimus }))
+      .catch(err => console.log(err));
   };
 
   render() {
-    const { text, selectedWord } = this.state;
+    const { text, selectedWord, synonimus } = this.state;
 
     return (
-      <div className="App">
-        <header>
+      <AppContainer>
+        <Header>
           <span>Simple Text Editor</span>
-        </header>
-        <main>
+        </Header>
+        <Main>
           <ControlPanel
             changeStyle={this.changeStyle}
             selectedWord={selectedWord}
           />
-          <FileZone
-            textToDisplay={text}
-            getSelectedWord={this.getSelectedWord}
-          />
-        </main>
-      </div>
+          <FileZone textToDisplay={text} getSelectedWord={this.getSelectedWord}>
+            <SunonimusZone
+              onClick={this.getWords}
+              synonimus={synonimus}
+              handleWordReplace={this.handleWordReplace}
+            />
+          </FileZone>
+        </Main>
+      </AppContainer>
     );
   }
 }
