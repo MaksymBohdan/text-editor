@@ -1,16 +1,20 @@
 # Simple text editor
 This project was bootstrapped with [Create React App](https://github.com/facebookincubator/create-react-app).
 
-## Initial setup
-Run `npm install` in order to setup application
+## Installation and Setup Instructions
+Example:
+Clone down this repository. You will need node and npm installed globally on your machine.
 
-dd
+## Installation:
 
-## Development server
-Run `npm start` for a dev server.
+npm install
 
-## Notes
-+ Text sample is given in `text.service.js`
-+ Given files structure is not obligatory and could be changed
+## To Start Server:
+
+npm start
+
+## To Visit App:
+
+localhost:3000
 
 
